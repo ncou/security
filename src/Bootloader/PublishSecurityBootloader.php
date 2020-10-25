@@ -3,7 +3,7 @@
 namespace Chiron\Security\Bootloader;
 
 use Chiron\Core\Directories;
-use Chiron\Bootload\AbstractBootloader;
+use Chiron\Core\Container\Bootloader\AbstractBootloader;
 use Chiron\PublishableCollection;
 
 final class PublishSecurityBootloader extends AbstractBootloader
