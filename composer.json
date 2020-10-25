@@ -16,6 +16,7 @@
     },
     "require": {
         "php": "^7.2",
+        "chiron/config": "^1.6",
         "chiron/encrypter": "^1.0"
     },
     "require-dev": {
