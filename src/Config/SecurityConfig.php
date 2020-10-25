@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Chiron\Security;
+namespace Chiron\Security\Config;
 
 use Chiron\Config\AbstractInjectableConfig;
 use Nette\Schema\Expect;
