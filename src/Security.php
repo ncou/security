@@ -73,6 +73,7 @@ final class Security
      *
      * @return string
      */
+    // TODO : Utiliser ce bout de code pour améliorer l'algo:       https://github.com/nette/utils/blob/master/src/Utils/Random.php#L26
     public static function generateId(int $length = 32, bool $easyToRead = false): string
     {
         if ($length < 1) {
