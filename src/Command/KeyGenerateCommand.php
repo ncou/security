@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 //key:generate --iterations=10
 //key:generate -i 10
 
-// TODO : déplacer cette commande dans le package chiron/security ????
 final class KeyGenerateCommand extends AbstractCommand
 {
     protected static $defaultName = 'key:generate';
