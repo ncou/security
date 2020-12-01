@@ -4,6 +4,18 @@ namespace Chiron\Security;
 
 use InvalidArgumentException;
 
+// TODO : exemple pour SIGNER les cookies.
+// https://github.com/tj/node-cookie-signature/blob/master/index.js
+// TODO : vérification si le SIGNED cookie commence bien par "s:"
+//https://github.com/expressjs/cookie-parser/blob/master/index.js#L134
+//https://github.com/balderdashy/sails/blob/53d0473c2876b1925136f777cb51ac9eda5b24aa/lib/hooks/session/index.js#L513
+
+// TODO : exemple pour vérifier les cookies signés (doivent commencer par 's:')
+//https://github.com/balderdashy/sails/blob/53d0473c2876b1925136f777cb51ac9eda5b24aa/lib/hooks/session/index.js#L481
+//https://github.com/expressjs/cookie-parser/blob/master/index.js#L129
+//https://github.com/expressjs/session/blob/master/index.js#L656
+
+
 //https://github.com/ircmaxell/RandomLib/blob/master/lib/RandomLib/Generator.php
 
 //https://github.com/hackzilla/password-generator/blob/master/Generator/ComputerPasswordGenerator.php#L38
@@ -52,7 +64,7 @@ final class Security
      * @param int $bytes Size in bytes for the generated key
      * @param bool $raw Apply (or not) an hexa decimal encoding
      *
-     * @return string
+     * @return string Return as lowercase hexits unless $raw is set to true in which case the raw binary value is returned.
      */
     public static function generateKey(int $bytes = 32, bool $raw = true): string
     {
@@ -115,7 +127,7 @@ final class Security
      *
      * @return string
      */
-    public static function uuid()
+    public static function uuid(): string
     {
         return implode('-', [
             bin2hex(random_bytes(4)),
@@ -124,5 +136,38 @@ final class Security
             bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
             bin2hex(random_bytes(6))
         ]);
+    }
+
+    /**
+     * Sign the value (signature is added after the ":" separator).
+     *
+     * @param string $value
+     * @param string $key
+     *
+     * @return string|bool Return the value or false if signature is incorrect
+     */
+    public static function sign(string $value, string $key): string
+    {
+        // Generate a keyed hexits hash used as signature.
+        $hmac = hash_hmac('sha256', $value, $key);
+
+        return $value . ':' . $hmac;
+    }
+
+    /**
+     * Unsign the value (signature after the ":" separator is removed).
+     *
+     * @param string $value
+     * @param string $key
+     *
+     * @return string|bool Return the value or false if signature is incorrect
+     */
+    public static function unsign(string $value, string $key)
+    {
+        $data = substr($value, 0, strrpos($value, ':'));
+        $signed = static::sign($data, $key);
+
+        // TODO : lever une BadSignatureException('Signature "%s" failed.') au lieu de retourner false ???
+        return hash_equals($value, $signed) ? $data : false;
     }
 }
