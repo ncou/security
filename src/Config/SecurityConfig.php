@@ -9,6 +9,8 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Closure;
 
+// TODO : créer une Facade 'Security::class' pour cette classe pour récupérer la clés via la méthode Security::getKey() ou Security::getRawKey()
+
 final class SecurityConfig extends AbstractInjectableConfig
 {
     protected const CONFIG_SECTION_NAME = 'security';
@@ -18,7 +20,7 @@ final class SecurityConfig extends AbstractInjectableConfig
     protected function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'length = 64 characters')->default(env('APP_KEY')),
+            'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
         ]);
     }
 

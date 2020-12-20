@@ -1,6 +1,6 @@
 <?php
 
-namespace Chiron\Security;
+namespace Chiron\Security\Support;
 
 use InvalidArgumentException;
 
@@ -77,8 +77,7 @@ $number     = $random->number($n);
 
 // TODO : créer des méthodes globales (dans functions.php) style uuid() ou generate_key() et random_id() et sign() et unsign() pour simplifier l'utilisation de ces méthodes !!!
 
-// TODO : renommer la classe en Random::class ????
-final class Security
+final class Random
 {
     /**
      * Generate a secure random unique key.
@@ -99,6 +98,16 @@ final class Security
         $key = random_bytes($bytes);
 
         return $raw ? $key : bin2hex($key);
+    }
+
+    public static function hex(int $bytes = 32): string
+    {
+        return static::generateKey($bytes, false);
+    }
+
+    public static function bytes(int $bytes = 32): string
+    {
+        return static::generateKey($bytes, true);
     }
 
     /**
@@ -132,6 +141,11 @@ final class Security
         return $str;
     }
 
+    public static function alphanum(int $length = 32, bool $easyToRead = false): string
+    {
+        return static::randomId($length, $easyToRead);
+    }
+
 /*
     function str_rand(int $length = 64){ // 64 = 32
         $length = ($length < 4) ? 4 : $length;
@@ -160,41 +174,5 @@ final class Security
             bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
             bin2hex(random_bytes(6))
         ]);
-    }
-
-    /**
-     * Sign the value (signature is added after the ":" separator).
-     * ex : "My String" will return "My String:ae787d87d87h87....23c"
-     *
-     * @param string $value
-     * @param string $key
-     *
-     * @return string|bool Return the value or false if signature is incorrect
-     */
-    // TODO : déplacer cette méthode dans une classe Signer::class qui prendra dans le constructeur un securityConfig pour récupérer automatiquement la clés à utiliser pour le sign/unsign
-    public static function sign(string $value, string $key): string
-    {
-        // Generate a keyed hexits hash used as signature.
-        $hmac = hash_hmac('sha256', $value, $key);
-
-        return $value . ':' . $hmac;
-    }
-
-    /**
-     * Unsign the value (signature after the ":" separator is removed).
-     * ex : "My String:ae787d87d87h87....23c" will return "My String"
-     *
-     * @param string $value
-     * @param string $key
-     *
-     * @return null|string Return the value or null if signature is incorrect
-     */
-    // TODO : déplacer cette méthode dans une classe Signer::class qui prendra dans le constructeur un securityConfig pour récupérer automatiquement la clés à utiliser pour le sign/unsign
-    public static function unsign(string $value, string $key): ?string
-    {
-        $data = substr($value, 0, strrpos($value, ':'));
-        $signed = static::sign($data, $key);
-
-        return hash_equals($value, $signed) ? $data : null;
     }
 }

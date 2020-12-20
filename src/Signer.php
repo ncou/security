@@ -2,6 +2,9 @@
 
 namespace Chiron\Security;
 
+use Chiron\Security\Config\SecurityConfig;
+use Chiron\Security\Support\Base64;
+use Chiron\Security\Exception\BadSignatureException;
 use InvalidArgumentException;
 
 // BASE62 :
@@ -76,90 +79,41 @@ $number     = $random->number($n);
 // TODO : renommer la classe en "Security", et créer 2 méthode generateKey() qui retourn un randombyte et un generateId ou uniqueId qui génére une string aléatoire. Et aussi créer la méthode randomString($length, $alphabet) avec des constante pluc dans classe (style UPPER/LOWER/SYMBOLS/AMBIGUOIUS etc...)
 
 // TODO : créer des méthodes globales (dans functions.php) style uuid() ou generate_key() et random_id() et sign() et unsign() pour simplifier l'utilisation de ces méthodes !!!
-
-// TODO : renommer la classe en Random::class ????
-final class Security
+final class Signer
 {
+    public const SEPARATOR = ':';
     /**
-     * Generate a secure random unique key.
-     * If the $raw value is false an hexadecimal encoding is applied.
-     * In hexa, the string output length is $bytes X 2 in the range [0123456789abcdef].
+     * The 256 bit/32 byte binary key to use as a secret key.
      *
-     * @param int $bytes Size in bytes for the generated key
-     * @param bool $raw Apply (or not) an hexa decimal encoding
-     *
-     * @return string Return as lowercase hexits unless $raw is set to true in which case the raw binary value is returned.
+     * @var string
      */
-    public static function generateKey(int $bytes = 32, bool $raw = true): string
-    {
-        if ($bytes < 1) {
-            throw new InvalidArgumentException('Invalid key bytes size value.'); // TODO : indiquer dans le message un truc du genre : should be above 0 ou should be/expect a positive integer
-        }
-
-        $key = random_bytes($bytes);
-
-        return $raw ? $key : bin2hex($key);
-    }
+    private $key;
 
     /**
-     * Generate a random string identifier.
-     *
-     * @param int $length      Length of the random string to generate
-     * @param bool $easyToRead Prevent ambiguous characters in the result
-     *
-     * @return string
-     */
-    // TODO : Utiliser ce bout de code pour améliorer l'algo:       https://github.com/nette/utils/blob/master/src/Utils/Random.php#L26
-    public static function randomId(int $length = 32, bool $easyToRead = false): string
-    {
-        if ($length < 1) {
-            throw new InvalidArgumentException('Invalid identifier length value.'); // TODO : indiquer dans le message un truc du genre : should be above 0 ou should be/expect a positive integer
-        }
-
-        $alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        if ($easyToRead) {
-            // remove ambiguous characters.
-            $alphabet = str_replace(str_split('B8G6I1l0OQDS5Z2'), '', $alphabet);
-        }
-
-        $str = '';
-        $maxLength = strlen($alphabet) - 1;
-        for ($i = 0; $i < $length; ++$i) {
-            $str .= $alphabet[random_int(0, $maxLength)];
-        }
-
-        return $str;
-    }
-
-/*
-    function str_rand(int $length = 64){ // 64 = 32
-        $length = ($length < 4) ? 4 : $length;
-        return bin2hex(random_bytes(($length-($length%2))/2));
-    }
-
-    var_dump(str_rand());
-    // d6199909d0b5fdc22c9db625e4edf0d6da2b113b21878cde19e96f4afe69e714
+     * Salt can be used to namespace the hash, so that a signed string is
+     * only valid for a given namespace. Leaving this at the default
+     * value or re-using a salt value across different parts of your
+     * application without good cause is a security risk.
     */
+    private $salt = '';
 
+    public function __construct(SecurityConfig $config)
+    {
+        $this->key = $config->getRawKey();
+    }
 
     /**
-     * Return a UUID (version 4) using random bytes
-     * Note that version 4 follows the format:
-     *     xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
-     * where Y is one of: [8, 9, a, b]
+     * Define a salt to be used with the secret key to namespace the hash.
      *
-     * @return string
+     * @param string $salt
+     * @return self
      */
-    public static function uuid(): string
+    public function withSalt(string $salt): self
     {
-        return implode('-', [
-            bin2hex(random_bytes(4)),
-            bin2hex(random_bytes(2)),
-            bin2hex(chr((ord(random_bytes(1)) & 0x0F) | 0x40)) . bin2hex(random_bytes(1)),
-            bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
-            bin2hex(random_bytes(6))
-        ]);
+        $new = clone $this;
+        $new->salt = $salt;
+
+        return $new;
     }
 
     /**
@@ -167,17 +121,15 @@ final class Security
      * ex : "My String" will return "My String:ae787d87d87h87....23c"
      *
      * @param string $value
-     * @param string $key
      *
-     * @return string|bool Return the value or false if signature is incorrect
+     * @return string
      */
-    // TODO : déplacer cette méthode dans une classe Signer::class qui prendra dans le constructeur un securityConfig pour récupérer automatiquement la clés à utiliser pour le sign/unsign
-    public static function sign(string $value, string $key): string
+    public function sign(string $value): string
     {
-        // Generate a keyed hexits hash used as signature.
-        $hmac = hash_hmac('sha256', $value, $key);
+        // Generate a salted keyed binary hash used as signature.
+        $hmac = hash_hmac('sha256', $value, $this->salt . $this->key, true);
 
-        return $value . ':' . $hmac;
+        return $value . self::SEPARATOR . Base64::encode($hmac);
     }
 
     /**
@@ -185,16 +137,27 @@ final class Security
      * ex : "My String:ae787d87d87h87....23c" will return "My String"
      *
      * @param string $value
-     * @param string $key
      *
-     * @return null|string Return the value or null if signature is incorrect
+     * @throws BadSignatureException Exception in case signature is invalid.
+     *
+     * @return string Return the value if signature is valid.
      */
-    // TODO : déplacer cette méthode dans une classe Signer::class qui prendra dans le constructeur un securityConfig pour récupérer automatiquement la clés à utiliser pour le sign/unsign
-    public static function unsign(string $value, string $key): ?string
+    public function unsign(string $value): string
     {
-        $data = substr($value, 0, strrpos($value, ':'));
-        $signed = static::sign($data, $key);
+        $position = strrpos($value, self::SEPARATOR);
 
-        return hash_equals($value, $signed) ? $data : null;
+        // Throw an exception if the separator is not found.
+        if ($position === false) {
+            throw new BadSignatureException('No signature separator found in value.');
+        }
+
+        $data = substr($value, 0, $position);
+        $signed = static::sign($data, $this->key);
+
+        if (hash_equals($value, $signed)) {
+            return $data;
+        }
+
+        throw new BadSignatureException('Signature value does not match.');
     }
 }
