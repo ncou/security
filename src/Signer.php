@@ -7,6 +7,9 @@ use Chiron\Security\Support\Base64;
 use Chiron\Security\Exception\BadSignatureException;
 use InvalidArgumentException;
 
+//https://github.com/ilkivv/atleteraru/blob/7df8594924caceb13eebe64bdd7ec7c91fe5c0a1/bitrix/modules/main/lib/security/sign/timesigner.php
+//https://github.com/Kyslik/django-signer/blob/master/src/Signer.php
+
 // BASE62 :
 // https://snipplr.com/view/22246/base62-encode--decode
 // https://programanddesign.com/php/base62-encode/
@@ -79,6 +82,13 @@ $number     = $random->number($n);
 // TODO : renommer la classe en "Security", et créer 2 méthode generateKey() qui retourn un randombyte et un generateId ou uniqueId qui génére une string aléatoire. Et aussi créer la méthode randomString($length, $alphabet) avec des constante pluc dans classe (style UPPER/LOWER/SYMBOLS/AMBIGUOIUS etc...)
 
 // TODO : créer des méthodes globales (dans functions.php) style uuid() ou generate_key() et random_id() et sign() et unsign() pour simplifier l'utilisation de ces méthodes !!!
+
+/**
+ * Sign and Unsign a string with a keyed hmac compressed using base64.
+ * Inspired by django signing module.
+ *
+ * @see https://docs.djangoproject.com/en/3.0/_modules/django/core/signing/
+ */
 final class Signer
 {
     public const SEPARATOR = ':';
@@ -94,7 +104,9 @@ final class Signer
      * only valid for a given namespace. Leaving this at the default
      * value or re-using a salt value across different parts of your
      * application without good cause is a security risk.
-    */
+     *
+     * @var string
+     */
     private $salt = '';
 
     public function __construct(SecurityConfig $config)
@@ -144,11 +156,11 @@ final class Signer
      */
     public function unsign(string $value): string
     {
-        $position = strrpos($value, self::SEPARATOR);
+        $position = strrpos($value, self::SEPARATOR); // TODO : vérifier quand même ce qui se passe si on ne met pas l'exception en dessous quand strrpos retourne false voir si cela fonctionne quand même.
 
         // Throw an exception if the separator is not found.
         if ($position === false) {
-            throw new BadSignatureException('No signature separator found in value.');
+            throw new BadSignatureException('No signature separator found in value.'); //Separator not found in value.
         }
 
         $data = substr($value, 0, $position);
@@ -160,4 +172,20 @@ final class Signer
 
         throw new BadSignatureException('Signature value does not match.');
     }
+
+    /**
+     * Return a URL-safe base64-encoded hash of the input $value
+     *
+     * @param string $value
+     * @return string
+     */
+    /*
+    public function hashBase64(string $value): string
+    {
+        $binaryHash = hash_hmac('sha1', $value, $this->secret . 'signer', true);
+        $base64 = base64_encode($binaryHash);
+        $base64UrlSafe = str_replace(array('+', '/'), array('-', '_'), $base64);
+
+        return rtrim($base64UrlSafe, '=');
+    }*/
 }

@@ -4,6 +4,11 @@ namespace Chiron\Security\Support;
 
 use InvalidArgumentException;
 
+// TODO : renommer la classe en Base64UrlSafe
+
+//https://github.com/ElfSundae/urlsafe-base64/blob/master/src/helpers.php
+
+
 // BASE62 :
 // https://snipplr.com/view/22246/base62-encode--decode
 // https://programanddesign.com/php/base62-encode/
