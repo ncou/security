@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Chiron\Security\Command;
 
-use Chiron\Console\AbstractCommand;
+use Chiron\Core\Console\AbstractCommand;
 use Chiron\Security\Config\SecurityConfig;
 use Chiron\Filesystem\Filesystem;
 use Chiron\Security\Support\Random;
