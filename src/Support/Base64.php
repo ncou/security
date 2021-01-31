@@ -82,6 +82,7 @@ $number     = $random->number($n);
 
 // TODO : créer des méthodes globales (dans functions.php) style uuid() ou generate_key() et random_id() et sign() et unsign() pour simplifier l'utilisation de ces méthodes !!!
 
+// TODO : créer une classe Strings ou Str dans le package chiron/core (répertoire Support) qui aurait une méthode base64UrlEncode/Decode
 final class Base64
 {
     /**
