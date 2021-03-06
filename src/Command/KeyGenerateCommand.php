@@ -7,7 +7,7 @@ namespace Chiron\Security\Command;
 use Chiron\Core\Command\AbstractCommand;
 use Chiron\Security\Config\SecurityConfig;
 use Chiron\Filesystem\Filesystem;
-use Chiron\Security\Support\Random;
+use Chiron\Support\Random;
 use Symfony\Component\Console\Input\InputOption;
 
 //key:generate --iterations=10

@@ -3,7 +3,7 @@
 namespace Chiron\Security;
 
 use Chiron\Security\Config\SecurityConfig;
-use Chiron\Security\Support\Base64;
+use Chiron\Support\Base64;
 use Chiron\Security\Exception\BadSignatureException;
 use InvalidArgumentException;
 

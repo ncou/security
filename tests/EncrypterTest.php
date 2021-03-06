@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Chiron\Security\Tests;
 
 use Chiron\Security\Encrypter;
-use Chiron\Security\Support\Random;
+use Chiron\Support\Random;
 use Chiron\Container\Container;
 use Chiron\Security\Config\SecurityConfig;
 use PHPUnit\Framework\TestCase;

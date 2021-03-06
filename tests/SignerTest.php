@@ -6,7 +6,7 @@ namespace Chiron\Security\Tests;
 
 use Chiron\Security\Signer;
 use Chiron\Security\Exception\BadSignatureException;
-use Chiron\Security\Support\Random;
+use Chiron\Support\Random;
 use Chiron\Container\Container;
 use Chiron\Security\Config\SecurityConfig;
 use PHPUnit\Framework\TestCase;
