@@ -6,12 +6,12 @@ namespace Chiron\Security\Bootloader;
 
 use Chiron\Core\Container\Bootloader\AbstractBootloader;
 use Chiron\Console\Console;
-use Chiron\Security\Command\KeyGenerateCommand;
+use Chiron\Security\Command\KeyUpdateCommand;
 
-final class KeyGenerateCommandBootloader extends AbstractBootloader
+final class KeyUpdateCommandBootloader extends AbstractBootloader
 {
     public function boot(Console $console): void
     {
-        $console->addCommand(KeyGenerateCommand::getDefaultName(), KeyGenerateCommand::class);
+        $console->addCommand(KeyUpdateCommand::getDefaultName(), KeyUpdateCommand::class);
     }
 }
