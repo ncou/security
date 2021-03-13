@@ -20,7 +20,8 @@ final class SecurityConfig extends AbstractInjectableConfig
     protected function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
+            //'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
+            'key' => Expect::string()->default(env('APP_KEY')),
         ]);
     }
 
@@ -31,7 +32,8 @@ final class SecurityConfig extends AbstractInjectableConfig
 
     public function getRawKey(): string
     {
-        return hex2bin($this->getKey());
+        return $this->getKey();
+        //return hex2bin($this->getKey());
     }
 
     /**
