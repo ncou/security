@@ -19,11 +19,10 @@ final class KeyUpdateCommand extends AbstractCommand
     {
         $this
             ->setDescription('Update the security key value in the given file.')
-            ->addOption('mount', 'm', InputOption::VALUE_REQUIRED, 'Mount security key into given file')
-            ->addOption('placeholder', 'p', InputOption::VALUE_OPTIONAL, 'Placeholder of security key (will attempt to use current encryption key if empty)');
+            ->addOption('mount', 'm', InputOption::VALUE_REQUIRED, 'Mount security key into given file');
     }
 
-    protected function perform(Environment $environment, Filesystem $filesystem, SecurityConfig $securityConfig): int
+    protected function perform(SecurityConfig $securityConfig, Filesystem $filesystem): int
     {
         $filepath = $this->option('mount');
 
@@ -39,13 +38,7 @@ final class KeyUpdateCommand extends AbstractCommand
             return self::FAILURE;
         }
 
-        $placeholder = $this->option('placeholder');
-        // The placeholder is not defined
-        if ($placeholder === null) {
-            $placeholder = $securityConfig->getKey();
-        }
-
-        $updated = $this->updateEnvironmentFile($filesystem, $filepath, $placeholder);
+        $updated = $this->updateEnvironmentFile($securityConfig, $filesystem, $filepath);
 
         if ($updated) {
             $this->success('Security key has been updated.');
@@ -60,71 +53,15 @@ final class KeyUpdateCommand extends AbstractCommand
      * Update the environment file with the new security key.
      * Security key is by default a random 32 bytes hexabits.
      *
-     * @param  Filesystem  $filesystem
-     * @param  string      $filepath
-     * @param  string      $placeholder
-     *
-     * @return bool Return if the file has been updated or not.
-     */
-    private function updateEnvironmentFile(Filesystem $filesystem, string $filepath, string $placeholder): bool
-    {
-        // TODO si le placeholder est vide dans ce cas retourner "false" !!!!
-
-        $key = Random::hex(SecurityConfig::KEY_BYTES_SIZE);
-
-        $content = preg_replace(
-            sprintf('/%s/', $placeholder),
-            $key,
-            $filesystem->read($filepath),
-            1,
-            $counter
-        );
-
-        // The variable $counter is filled with the number of replacements done.
-        if ($counter === 1) {
-            $filesystem->write($filepath, $content);
-
-            return true;
-        }
-
-        return false;
-
-
-        /*
-        $oldKey = $environment->get('APP_KEY');
-        $newKey = Random::hex(SecurityConfig::KEY_BYTES_SIZE);
-
-        $content = preg_replace(
-            sprintf('/^APP_KEY=%s/m', $oldKey),
-            'APP_KEY=' . $newKey,
-            $filesystem->read($filepath),
-            1,
-            $counter
-        );
-
-        // The variable $counter is filled with the number of replacements done.
-        if ($counter === 1) {
-            $filesystem->write($filepath, $content);
-
-            return true;
-        }
-
-        return false;*/
-    }
-
-    /**
-     * Update the environment file with the new security key.
-     * Security key is by default a random 32 bytes hexabits.
-     *
      * @param  Environment $environment
      * @param  Filesystem  $filesystem
      * @param  string      $filepath
      *
      * @return bool Return if the file has been updated or not.
      */
-    private function updateEnvironmentFile_SAVE(Environment $environment, Filesystem $filesystem, string $filepath): bool
+    private function updateEnvironmentFile(SecurityConfig $securityConfig, Filesystem $filesystem, string $filepath): bool
     {
-        $oldKey = $environment->get('APP_KEY');
+        $oldKey = $securityConfig->getKey();
         $newKey = Random::hex(SecurityConfig::KEY_BYTES_SIZE);
 
         $content = preg_replace(
@@ -138,6 +75,10 @@ final class KeyUpdateCommand extends AbstractCommand
         // The variable $counter is filled with the number of replacements done.
         if ($counter === 1) {
             $filesystem->write($filepath, $content);
+
+            if ($this->isVerbose()) {
+                $this->sprintf("<info>New key:</info> <fg=cyan>%s</fg=cyan>\n", $newKey);
+            }
 
             return true;
         }

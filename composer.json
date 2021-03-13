@@ -37,7 +37,7 @@
         "chiron": {
             "bootloaders": [
                 "Chiron\\Security\\Bootloader\\PublishSecurityBootloader",
-                "Chiron\\Security\\Bootloader\\KeyUpdateCommandBootloader"
+                "Chiron\\Security\\Bootloader\\SecurityCommandsBootloader"
             ]
       }
     }
