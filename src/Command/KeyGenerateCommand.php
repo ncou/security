@@ -37,9 +37,15 @@ final class KeyGenerateCommand extends AbstractCommand
         $this->info("Generated security key(s)");
 
         for ($i = 0; $i < $iterations; $i++) {
-            $this->message(Random::hex(SecurityConfig::KEY_BYTES_SIZE));
+            //$this->message(Random::hex(SecurityConfig::KEY_BYTES_SIZE));
+            $this->message($this->wrapAsBase64(Random::bytes(SecurityConfig::KEY_BYTES_SIZE)));
         }
 
         return self::SUCCESS;
+    }
+
+    private function wrapAsBase64(string $key): string
+    {
+        return 'base64:' . base64_encode($key); // TODO : utiliser la classe Support\Base64::class ????
     }
 }

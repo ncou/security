@@ -62,10 +62,10 @@ final class KeyUpdateCommand extends AbstractCommand
     private function updateEnvironmentFile(SecurityConfig $securityConfig, Filesystem $filesystem, string $filepath): bool
     {
         $oldKey = $securityConfig->getKey();
-        $newKey = Random::hex(SecurityConfig::KEY_BYTES_SIZE);
+        $newKey = $this->wrapAsBase64(Random::bytes(SecurityConfig::KEY_BYTES_SIZE));
 
         $content = preg_replace(
-            sprintf('/^APP_KEY=%s/m', $oldKey),
+            $this->keyReplacementPattern($oldKey),
             'APP_KEY=' . $newKey,
             $filesystem->read($filepath),
             1,
@@ -84,6 +84,23 @@ final class KeyUpdateCommand extends AbstractCommand
         }
 
         return false;
+    }
+
+    private function wrapAsBase64(string $key): string
+    {
+        return 'base64:' . base64_encode($key); // TODO : utiliser la classe Support\Base64::class ????
+    }
+
+    /**
+     * Get a regex pattern that will match env APP_KEY with any random key.
+     *
+     * @return string
+     */
+    protected function keyReplacementPattern(string $oldKey): string
+    {
+        $escaped = preg_quote('='.$this->wrapAsBase64($oldKey), '/');
+
+        return "/^APP_KEY{$escaped}/m";
     }
 }
 

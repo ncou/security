@@ -20,26 +20,23 @@ final class SecurityConfig extends AbstractInjectableConfig
     protected function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
+            //'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
+            'key' => Expect::string()->min(self::KEY_BYTES_SIZE)->max(self::KEY_BYTES_SIZE)->default(env('APP_KEY')),
         ]);
     }
 
-    // TODO : utiliser un paramétre bool $force_bytes ou $raw dans cette méthode get pour forcer le retour avec hex2bin ????
     public function getKey(): string
     {
         return $this->get('key');
     }
 
-    public function getRawKey(): string
-    {
-        return hex2bin($this->getKey());
-    }
-
     /**
      * Length of the key should be twice (x2) the bytes size because it's hexa encoded.
      */
+    /*
     private function assertKeyLength(string $value): bool
     {
+        // Il faudrait pas plutot utiliser le fonction mb_strlen($string, '8bit') ???? éventuellement utiliser directement le support Str::class
         return strlen($value) === self::KEY_BYTES_SIZE * 2;
-    }
+    }*/
 }

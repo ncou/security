@@ -7,6 +7,8 @@ namespace Chiron\Security\Support;
 use InvalidArgumentException;
 use RuntimeException;
 
+// TODO : renommer le répertoire en Helper et non pas en Support !!!!
+
 /**
  * Encrypter.
  *
@@ -209,6 +211,7 @@ final class Crypt
      *
      * @return string
      */
+    // TODO : Utiliser une méthode qui serait stockée dans le classe Chiron\Support\Str::class ????
     private static function substr(string $string, int $start, ?int $length = null): string
     {
         return mb_substr($string, $start, $length, '8bit');
@@ -221,6 +224,7 @@ final class Crypt
      *
      * @return int
      */
+    // TODO : Utiliser une méthode qui serait stockée dans le classe Chiron\Support\Str::class ????
     private static function strlen(string $string): int
     {
         return mb_strlen($string, '8bit');

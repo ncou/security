@@ -111,7 +111,7 @@ final class Signer
 
     public function __construct(SecurityConfig $config)
     {
-        $this->key = $config->getRawKey();
+        $this->key = $config->getKey();
     }
 
     /**
@@ -141,7 +141,7 @@ final class Signer
         // Generate a salted keyed binary hash used as signature.
         $hmac = hash_hmac('sha256', $value, $this->salt . $this->key, true);
 
-        return $value . self::SEPARATOR . Base64::encode($hmac);
+        return $value . self::SEPARATOR . Base64::encode($hmac); // TODO : attention car si le encode se passe mal on va retourner un booléen au lieu d'une string, la concaténation de tous les éléments va surement lever une erreur !!!!
     }
 
     /**

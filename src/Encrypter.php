@@ -32,7 +32,7 @@ final class Encrypter
 
     public function __construct(SecurityConfig $config)
     {
-        $this->key = $config->getRawKey();
+        $this->key = $config->getKey();
     }
 
     /**
