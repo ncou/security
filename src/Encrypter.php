@@ -7,7 +7,7 @@ namespace Chiron\Security;
 use Chiron\Security\Exception\DecryptException;
 use Chiron\Security\Exception\EncryptException;
 use Chiron\Security\Config\SecurityConfig;
-use Chiron\Security\Support\Crypt;
+use Chiron\Security\Helper\Crypt;
 use Throwable;
 use RuntimeException;
 

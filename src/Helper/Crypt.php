@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Chiron\Security\Support;
+namespace Chiron\Security\Helper;
 
 use InvalidArgumentException;
 use RuntimeException;
-
-// TODO : renommer le répertoire en Helper et non pas en Support !!!!
 
 /**
  * Encrypter.

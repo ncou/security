@@ -15,10 +15,11 @@ final class SecurityConfig extends AbstractInjectableConfig
 {
     protected const CONFIG_SECTION_NAME = 'security';
 
-    public const KEY_BYTES_SIZE = 32;
+    public const KEY_BYTES_SIZE = 32; // TODO : renommer la constante en KEY_SIZE et indiquer dans le commentaire que c'est des bytes.
 
     protected function getConfigSchema(): Schema
     {
+        // TODO : améliorer la vérification sur la longueur car c'est pas super propre de faire un min + un max.
         return Expect::structure([
             //'key' => Expect::xdigit()->assert(Closure::fromCallable([$this, 'assertKeyLength']), 'invalid key length.')->default(env('APP_KEY')),
             'key' => Expect::string()->min(self::KEY_BYTES_SIZE)->max(self::KEY_BYTES_SIZE)->default(env('APP_KEY')),

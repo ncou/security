@@ -86,6 +86,7 @@ final class KeyUpdateCommand extends AbstractCommand
         return false;
     }
 
+    // TODO : code à rendre plus propre/simple pour toute cette classe !!!!
     private function wrapAsBase64(string $key): string
     {
         return 'base64:' . base64_encode($key); // TODO : utiliser la classe Support\Base64::class ????

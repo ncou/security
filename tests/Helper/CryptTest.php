@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Chiron\Security\Tests\Support;
+namespace Chiron\Security\Tests\Helper;
 
-use Chiron\Security\Support\Crypt;
+use Chiron\Security\Helper\Crypt;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Chiron\Security\Support\Crypt
+ * @covers \Chiron\Security\Helper\Crypt
  */
 class CryptTest extends TestCase
 {
