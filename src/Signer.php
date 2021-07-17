@@ -7,6 +7,20 @@ use Chiron\Support\Base64;
 use Chiron\Security\Exception\BadSignatureException;
 use InvalidArgumentException;
 
+// TODO : ajouter un Timestamp signer pour sécuriser les url par exemple (+ ajouter un middleware si on veux !!!!) :
+//https://github.com/django/django/blob/main/django/core/signing.py#L212
+//https://medium.com/@ekeydar/signed-urls-storage-for-django-58feecbd94a8
+//https://stackoverflow.com/questions/56295539/how-do-i-reverse-match-url-using-timestampsigner-in-django
+//https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/cdn/snippets.py#L34
+//http://www.grokcode.com/819/one-click-unsubscribes-for-django-apps/
+//https://github.com/spatie/url-signer
+//https://github.com/spatie/laravel-url-signer
+//https://github.com/akaunting/signed-url
+//https://github.com/SAM-IT/yii2-urlsigner/tree/master/src
+//https://github.com/SaliBhdr/typhoon-url-signer
+//https://github.com/dsentker/url-signature/blob/67f192f8f3289025b13f19c6dcc9394d1835e8c3/src/SignatureGenerator.php#L25
+//https://github.com/dsentker/url-signature/blob/67f192f8f3289025b13f19c6dcc9394d1835e8c3/src/Validator.php#L42
+
 //https://github.com/ilkivv/atleteraru/blob/7df8594924caceb13eebe64bdd7ec7c91fe5c0a1/bitrix/modules/main/lib/security/sign/timesigner.php
 //https://github.com/Kyslik/django-signer/blob/master/src/Signer.php
 
@@ -18,6 +32,7 @@ use InvalidArgumentException;
 // https://github.com/breenie/base62/blob/master/src/Kurl/Maths/Encode/Driver/PurePhpEncoder.php
 // https://gist.github.com/jgrossi/a4eb21bbe00763d63385
 // https://github.com/vinkla/base62/blob/master/src/Base62.php
+// https://github.com/kierandg/laravel-url62-uuid/blob/master/src/Gponster/Uuid/Base62.php
 
 // TODO : sinon utiliser dechex et hexdec en repmplacement de la fonction Base62 pour réduire les integers
 
@@ -122,6 +137,13 @@ final class Signer
      */
     public function withSalt(string $salt): self
     {
+        // TODO : vérifier que le sel est bien une string cad pas null, éventuellement faire un strval() sur le paramétre $salt !!!!
+        // TODO : ajouter une vérification pour le salt du genre :
+        /*
+        if ($salt !== null && !preg_match('#^[a-zA-Z0-9_.-]{3,50}$#D', $salt))
+            throw new BadSignatureException('Malformed salt, only [a-zA-Z0-9_.-]{3,50} characters are acceptable');
+        */
+
         $new = clone $this;
         $new->salt = $salt;
 
@@ -141,6 +163,7 @@ final class Signer
         // Generate a salted keyed binary hash used as signature.
         $hmac = hash_hmac('sha256', $value, $this->salt . $this->key, true);
 
+        // TODO : es ce qu'un sprintf résou le probléme avec le booléen false si l'encodage b64 échoue ????
         return $value . self::SEPARATOR . Base64::encode($hmac); // TODO : attention car si le encode se passe mal on va retourner un booléen au lieu d'une string, la concaténation de tous les éléments va surement lever une erreur !!!!
     }
 
@@ -164,7 +187,7 @@ final class Signer
         }
 
         $data = substr($value, 0, $position);
-        $signed = static::sign($data, $this->key);
+        $signed = self::sign($data, $this->key);
 
         if (hash_equals($value, $signed)) {
             return $data;

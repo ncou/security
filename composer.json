@@ -39,6 +39,6 @@
                 "Chiron\\Security\\Bootloader\\PublishSecurityBootloader",
                 "Chiron\\Security\\Bootloader\\SecurityCommandsBootloader"
             ]
-      }
+        }
     }
 }

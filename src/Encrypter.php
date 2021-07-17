@@ -70,7 +70,7 @@ final class Encrypter
             $result = Crypt::decrypt(base64_decode($ciphertext), $this->key);
 
             // TODO : attention ca peut retourner null si la string à décoder n'est pas un json valide !!!! il faudrait vérifier que le résultat est un is_string() OU is_array(), sinon on retourne une chaine vide !!!!
-            return json_decode($result, true);
+            return json_decode($result, true); // TODO : utiliser une classe Support\JSON qui sera plus stricte et donc lévera une exception si le decode échoue !!!!
 
             //return unserialize($result);
 

@@ -11,6 +11,10 @@ use Chiron\Security\Config\SecurityConfig;
 use Chiron\Support\Random;
 use Symfony\Component\Console\Input\InputOption;
 
+// TODO : Exemple avec une classe qui remplace des valeurs dans le fichier .dotEnv
+//https://github.com/YasinSabir/gulive/blob/37c80420f66fa8cbff9e70ebfa4c24afe5587716/public/install_files/php/Installer.php#L265
+//https://github.com/YasinSabir/gulive/blob/37c80420f66fa8cbff9e70ebfa4c24afe5587716/common/Settings/DotEnvEditor.php#L5
+
 final class KeyUpdateCommand extends AbstractCommand
 {
     protected static $defaultName = 'key:update';
