@@ -47,7 +47,7 @@ final class Encrypter
     public function encrypt($data): string
     {
         // TODO : il faudrait pas vérifier que le json_encode fonctionne ??? il y a un risque d'avoir une exception, ou à minima un $data qui sera à false !!!! Eventuellement vérifier que le $data est bien un is_array ou is_string en entrée et sinon lever une EncryptException !!!
-        $data = json_encode($data);
+        $data = json_encode($data); // TODO : mettre cette instruction dans le try/catch ??? je pense qu'il est possible que le json_encode échoue et donc léve une exception ??? non ???
         //$data = serialize($data);
 
         try {
