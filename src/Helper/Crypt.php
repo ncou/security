@@ -19,8 +19,8 @@ final class Crypt
     public const CIPHER_METHOD = 'aes-256-ctr';
     public const HASH_FUNCTION_NAME = 'sha256';
     public const KEY_BYTE_SIZE = 32;
-    public const ENCRYPTION_INFO_STRING = 'Crypt|KeyForEncryption';
-    public const AUTHENTICATION_INFO_STRING = 'Crypt|KeyForAuthentication';
+    public const ENCRYPTION_INFO_STRING = 'Crypt|V1|KeyForEncryption';
+    public const AUTHENTICATION_INFO_STRING = 'Crypt|V1|KeyForAuthentication';
     public const MINIMUM_CIPHERTEXT_SIZE = 80;
     public const MAC_BYTE_SIZE = 32;
     public const SALT_BYTE_SIZE = 32;
