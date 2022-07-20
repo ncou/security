@@ -38,5 +38,10 @@
                 "Chiron\\Security\\Bootloader\\SecurityCommandsBootloader"
             ]
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

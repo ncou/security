@@ -15,6 +15,8 @@ use Symfony\Component\Console\Input\InputOption;
 //https://github.com/YasinSabir/gulive/blob/37c80420f66fa8cbff9e70ebfa4c24afe5587716/public/install_files/php/Installer.php#L265
 //https://github.com/YasinSabir/gulive/blob/37c80420f66fa8cbff9e70ebfa4c24afe5587716/common/Settings/DotEnvEditor.php#L5
 
+//https://github.com/codeigniter4/CodeIgniter4/blob/b7ec33cd5618f2e4d31fbc2df2f95879c8b7e07a/system/Commands/Encryption/GenerateKey.php#L182
+
 final class KeyUpdateCommand extends AbstractCommand
 {
     protected static $defaultName = 'key:update';
@@ -105,7 +107,7 @@ final class KeyUpdateCommand extends AbstractCommand
     {
         $escaped = preg_quote('='.$this->wrapAsBase64($oldKey), '/');
 
-        return "/^APP_KEY{$escaped}/m";
+        return "/^APP_KEY{$escaped}/m"; //https://github.com/laravel/breeze/blob/5af95eca8ee2d18077347a34b74a2658c8356682/src/Console/InstallsApiStack.php#L61
     }
 }
 
